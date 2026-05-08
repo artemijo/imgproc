@@ -36,7 +36,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	pipeline := NewPipeline(NewCropTo43(), NewAutoCorrect(), NewResizeTo900())
+	pipeline := NewPipeline(NewCropTo32(), NewAutoCorrect(), NewResizeFixed(840, 560))
 
 	files, err := collectJPGs(*inputDir)
 	if err != nil {

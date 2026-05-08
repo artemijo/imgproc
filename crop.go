@@ -4,31 +4,31 @@ import (
 	"image"
 )
 
-// CropTo43 crops the image to a 4:3 aspect ratio by taking the largest
-// centered 4:3 rectangle from the source.
-type CropTo43 struct{}
+// CropTo32 crops the image to a 3:2 aspect ratio by taking the largest
+// centered 3:2 rectangle from the source.
+type CropTo32 struct{}
 
-func NewCropTo43() *CropTo43 {
-	return &CropTo43{}
+func NewCropTo32() *CropTo32 {
+	return &CropTo32{}
 }
 
-func (c *CropTo43) Name() string { return "crop_4:3" }
+func (c *CropTo32) Name() string { return "crop_3:2" }
 
-func (c *CropTo43) Process(img image.Image) (image.Image, error) {
+func (c *CropTo32) Process(img image.Image) (image.Image, error) {
 	b := img.Bounds()
 	w := b.Dx()
 	h := b.Dy()
 
 	targetW, targetH := w, h
 
-	if w*3 > h*4 {
-		// Wider than 4:3 — constrain by height, crop sides.
-		targetW = h * 4 / 3
-	} else if w*3 < h*4 {
-		// Taller than 4:3 — constrain by width, crop top/bottom.
-		targetH = w * 3 / 4
+	if w*2 > h*3 {
+		// Wider than 3:2 — constrain by height, crop sides.
+		targetW = h * 3 / 2
+	} else if w*2 < h*3 {
+		// Taller than 3:2 — constrain by width, crop top/bottom.
+		targetH = w * 2 / 3
 	} else {
-		// Already 4:3.
+		// Already 3:2.
 		return img, nil
 	}
 
@@ -43,7 +43,6 @@ func (c *CropTo43) Process(img image.Image) (image.Image, error) {
 		return si.SubImage(rect), nil
 	}
 
-	// Fallback: manual copy.
 	dst := image.NewRGBA(rect)
 	for y := rect.Min.Y; y < rect.Max.Y; y++ {
 		for x := rect.Min.X; x < rect.Max.X; x++ {

@@ -7,45 +7,26 @@ import (
 	xdraw "golang.org/x/image/draw"
 )
 
-// ResizeTo900 resizes the image so the wide side is 900 pixels.
+// ResizeFixed resizes the image to a fixed width x height.
 // Uses CatmullRom (Lanczos-quality) interpolation.
-type ResizeTo900 struct {
-	TargetSize int
+type ResizeFixed struct {
+	Width  int
+	Height int
 }
 
-func NewResizeTo900() *ResizeTo900 {
-	return &ResizeTo900{TargetSize: 900}
+func NewResizeFixed(w, h int) *ResizeFixed {
+	return &ResizeFixed{Width: w, Height: h}
 }
 
-func (r *ResizeTo900) Name() string { return "resize_900" }
+func (r *ResizeFixed) Name() string { return "resize_fixed" }
 
-func (r *ResizeTo900) Process(img image.Image) (image.Image, error) {
+func (r *ResizeFixed) Process(img image.Image) (image.Image, error) {
 	b := img.Bounds()
-	w := b.Dx()
-	h := b.Dy()
-
-	wideSide := w
-	if h > w {
-		wideSide = h
-	}
-
-	if wideSide == r.TargetSize {
+	if b.Dx() == r.Width && b.Dy() == r.Height {
 		return img, nil
 	}
 
-	scale := float64(r.TargetSize) / float64(wideSide)
-	newW := int(float64(w) * scale)
-	newH := int(float64(h) * scale)
-
-	if newW < 1 {
-		newW = 1
-	}
-	if newH < 1 {
-		newH = 1
-	}
-
-	dst := image.NewRGBA(image.Rect(0, 0, newW, newH))
+	dst := image.NewRGBA(image.Rect(0, 0, r.Width, r.Height))
 	xdraw.CatmullRom.Scale(dst, dst.Bounds(), img, b, draw.Over, nil)
-
 	return dst, nil
 }
